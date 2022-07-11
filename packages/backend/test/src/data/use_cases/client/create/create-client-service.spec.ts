@@ -42,6 +42,17 @@ describe('Create Client Service', () => {
     const promise = service.start({ ...mockCreate, email: 'email_notvalid' });
     expect(promise).rejects.toThrow(new TypeParamError('Email'));
   });
+
+  //Test Telephone Validator
+  it('should to throw if telephone type not valid', async () => {
+    const promise = service.start({
+      ...mockCreate,
+      email: 'telephone_not_valid',
+    });
+    expect(promise).rejects.toThrow(new TypeParamError('Telephone'));
+  });
+
+  // Tests Check user already exists
   it('should to throw if repo return a user with email equal', async () => {
     findRepo.get.mockResolvedValueOnce(mockCreate);
 
