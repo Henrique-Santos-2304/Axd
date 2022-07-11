@@ -7,6 +7,7 @@ import { ICreateClientModel } from '@useCases/client/create/interfaces/create-cl
 import { ICreateClientService } from '@useCases/client/create/interfaces/service-interface';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { IGetByDataBaseRepo } from 'src/infra/repository/base/getByData/interface-get-by-data-repository';
+import { ValidatorError, VALIDATOR_ERROR } from '@errors/error-validator';
 
 describe('Create Client Service', () => {
   let service: ICreateClientService;
@@ -30,6 +31,12 @@ describe('Create Client Service', () => {
     validateEmail.validate.mockReturnValue(true);
   });
 
+  // Test Email Validator
+  it('should to throw if email validator is ocurred error', async () => {
+    validateEmail.validate.mockReturnValueOnce(VALIDATOR_ERROR);
+    const promise = service.start({ ...mockCreate, email: 'email_notvalid' });
+    expect(promise).rejects.toThrow(new ValidatorError('Email'));
+  });
   it('should to throw if email type not valid', async () => {
     validateEmail.validate.mockReturnValueOnce(false);
     const promise = service.start({ ...mockCreate, email: 'email_notvalid' });
