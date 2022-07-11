@@ -10,6 +10,7 @@ import { ICreateClientService } from '@useCases/client/create/interfaces/service
 import { mock, MockProxy } from 'jest-mock-extended';
 import { IGetByDataBaseRepo } from 'src/infra/repository/base/getByData/interface-get-by-data-repository';
 import { ValidatorError, VALIDATOR_ERROR } from '@errors/error-validator';
+import { EmailValidator } from '@utils/validator/email_validatot';
 
 describe('Create Client Service', () => {
   let service: ICreateClientService;
@@ -46,6 +47,12 @@ describe('Create Client Service', () => {
   });
 
   // Test Email Validator
+  it('should Email validtor to have been caleed with data received', async () => {
+    const fn = jest.spyOn(validateEmail, 'validate');
+    await service.start(mockCreate);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith({ email: mockCreate.email });
+  });
   it('should to throw if email validator is ocurred error', async () => {
     validateEmail.validate.mockReturnValueOnce(VALIDATOR_ERROR);
     const promise = service.start({ ...mockCreate, email: 'email_notvalid' });
@@ -58,6 +65,12 @@ describe('Create Client Service', () => {
   });
 
   //Test Telephone Validator
+  it('should telephone validtor to have been caleed with data received', async () => {
+    const fn = jest.spyOn(validateTelephone, 'validate');
+    await service.start(mockCreate);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith({ telephone: mockCreate.telephone });
+  });
   it('should to throw if telephone validator is ocurred error', async () => {
     validateTelephone.validate.mockReturnValueOnce(VALIDATOR_ERROR);
     const promise = service.start({
@@ -77,6 +90,16 @@ describe('Create Client Service', () => {
   });
 
   // Tests Check user already exists
+  it('should find client repo to have been caleed with data received', async () => {
+    const fn = jest.spyOn(findRepo, 'get');
+    await service.start(mockCreate);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith({
+      table: 'client',
+      column: 'email',
+      where: mockCreate.email,
+    });
+  });
   it('should to throw if repo return a user with email equal', async () => {
     findRepo.get.mockResolvedValueOnce(mockCreate);
 
@@ -92,6 +115,12 @@ describe('Create Client Service', () => {
   });
 
   //Test create Client
+  it('should create client to have been caleed with data received', async () => {
+    const fn = jest.spyOn(createRepo, 'create');
+    await service.start(mockCreate);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith({ table: 'client', data: mockCreate });
+  });
   it('should to throw if repo create return database error message', async () => {
     createRepo.create.mockResolvedValueOnce(DATABASE_ERROR);
 

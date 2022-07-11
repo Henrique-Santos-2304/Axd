@@ -1,7 +1,7 @@
 import { TypeParamError } from '@errors/error-parameters';
 import { IGetByDataBaseRepo } from 'src/infra/repository/base/getByData/interface-get-by-data-repository';
 import { Injectable } from '@nestjs/common';
-import { AlreadyExists } from '@errors/error-data';
+import { AlreadyExists, FailedCreated } from '@errors/error-data';
 import { DatabaseError, DATABASE_ERROR } from '@errors/errors-database';
 import { IEmailValidator } from '@utils/validator/interfaces/interface-email-validator';
 import { ValidatorError, VALIDATOR_ERROR } from '@errors/error-validator';
@@ -57,7 +57,8 @@ class CreateClientService implements ICreateClientService {
     });
 
     if (created === DATABASE_ERROR) throw new DatabaseError();
-    return created;
+    else if (!created) throw new FailedCreated('Client');
+    else return created;
   }
 }
 
