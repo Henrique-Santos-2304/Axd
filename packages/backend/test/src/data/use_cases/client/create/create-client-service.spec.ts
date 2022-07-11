@@ -1,3 +1,4 @@
+import { IEmailValidator } from '@utils/validator/interfaces/interface-email-validator';
 import { AlreadyExists } from '@errors/error-data';
 import { TypeParamError } from '@errors/error-parameters';
 import { DatabaseError, DATABASE_ERROR } from '@errors/errors-database';
@@ -10,6 +11,7 @@ import { IGetByDataBaseRepo } from 'src/infra/repository/base/getByData/interfac
 describe('Create Client Service', () => {
   let service: ICreateClientService;
   let findRepo: MockProxy<IGetByDataBaseRepo>;
+  let validateEmail: MockProxy<IEmailValidator>;
 
   const mockCreate: ICreateClientModel = {
     name: 'mock',
@@ -21,12 +23,15 @@ describe('Create Client Service', () => {
 
   beforeAll(() => {
     findRepo = mock();
-    service = new CreateClientService(findRepo);
+    validateEmail = mock();
+    service = new CreateClientService(findRepo, validateEmail);
 
     findRepo.get.mockResolvedValue(undefined);
+    validateEmail.validate.mockReturnValue(true);
   });
 
   it('should to throw if email type not valid', async () => {
+    validateEmail.validate.mockReturnValueOnce(false);
     const promise = service.start({ ...mockCreate, email: 'email_notvalid' });
     expect(promise).rejects.toThrow(new TypeParamError('Email'));
   });
