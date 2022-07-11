@@ -5,5 +5,12 @@ class AlreadyExists extends Error {
     Object.setPrototypeOf(this, AlreadyExists.prototype);
   }
 }
+class FailedCreated extends Error {
+  constructor(data: string) {
+    super(`Failed in at created ${data}`);
 
-export { AlreadyExists };
+    Object.setPrototypeOf(this, FailedCreated.prototype);
+  }
+}
+
+export { AlreadyExists, FailedCreated };
