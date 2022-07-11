@@ -1,3 +1,5 @@
+import { databaseErrorProps } from '@errors/errors-database';
+
 /*
   
 ------>     Base repository for search data in specific table with specific column. <-------
@@ -20,7 +22,7 @@ interface IGetByDataBaseRepo {
 
 namespace IGetByDataBaseRepo {
   export type Params = { table: string; column: string; where: string };
-  export type Response<R = any> = Promise<R | undefined>;
+  export type Response<R = any> = Promise<R | undefined | databaseErrorProps>;
 }
 
 export { IGetByDataBaseRepo };

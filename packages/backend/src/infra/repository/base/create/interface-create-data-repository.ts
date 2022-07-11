@@ -1,3 +1,5 @@
+import { databaseErrorProps } from '@errors/errors-database';
+
 /*
   
 ------>     Base repository for creating any model. <-------
@@ -21,7 +23,7 @@ interface ICreateBaseRepo {
 
 namespace ICreateBaseRepo {
   export type Params<P = any> = { table: string; data: P };
-  export type Response<R = any> = Promise<R | undefined>;
+  export type Response<R = any> = Promise<R | undefined | databaseErrorProps>;
 }
 
 export { ICreateBaseRepo };

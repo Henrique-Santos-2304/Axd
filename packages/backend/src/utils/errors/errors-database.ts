@@ -1,9 +1,12 @@
+const DATABASE_ERROR = `Database Error`;
+type databaseErrorProps = `Database Error`;
+
 class DatabaseError extends Error {
   constructor() {
-    super(`Database Error`);
+    super(DATABASE_ERROR);
 
     Object.setPrototypeOf(this, DatabaseError.prototype);
   }
 }
 
-export { DatabaseError };
+export { DatabaseError, DATABASE_ERROR, databaseErrorProps };
