@@ -17,7 +17,8 @@ describe('Create Client Service', () => {
     service = new CreateClientService();
   });
 
-  it('should expect received error if user already exist', () => {
+  it('should expect received error if user already exist', async () => {
+    await service.start(mockCreate);
     const promise = service.start(mockCreate);
     expect(promise).rejects.toThrow();
   });
