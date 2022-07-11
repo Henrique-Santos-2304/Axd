@@ -17,7 +17,7 @@
       "@main/*": ["./src/main/*"],
       "@errors/*": ["./src/utils/errors/*"],
       "@utils/*": ["./src/utils/*"],
-
+      "@infra/*": ["./src/infra/*"],
       "@test/*": ["./test/*"]
     }
   }
