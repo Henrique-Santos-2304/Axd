@@ -1,4 +1,5 @@
 import { AlreadyExists } from '@errors/error-data';
+import { TypeParamError } from '@errors/error-parameters';
 import { DatabaseError, DATABASE_ERROR } from '@errors/errors-database';
 import { CreateClientService } from '@useCases/client/create/create.service';
 import { ICreateClientModel } from '@useCases/client/create/interfaces/create-client-model';
@@ -25,6 +26,10 @@ describe('Create Client Service', () => {
     findRepo.get.mockResolvedValue(undefined);
   });
 
+  it('should to throw if email type not valid', async () => {
+    const promise = service.start({ ...mockCreate, email: 'email_notvalid' });
+    expect(promise).rejects.toThrow(new TypeParamError('Email'));
+  });
   it('should to throw if repo return a user with email equal', async () => {
     findRepo.get.mockResolvedValueOnce(mockCreate);
 
