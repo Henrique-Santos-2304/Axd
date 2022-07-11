@@ -1,16 +1,20 @@
-import { ICreateBaseRepo } from 'src/infra/repository/base/create/interface-create-data-repository';
-import { ITelephoneValidator } from '@utils/validator/interfaces/interface-telephone-validator';
-import { IEmailValidator } from '@utils/validator/interfaces/interface-email-validator';
-import { AlreadyExists, FailedCreated } from '@errors/error-data';
-import { TypeParamError } from '@errors/error-parameters';
-import { DatabaseError, DATABASE_ERROR } from '@errors/errors-database';
-import { CreateClientService } from '@useCases/client/create/create.service';
-import { ICreateClientModel } from '@useCases/client/create/interfaces/create-client-model';
-import { ICreateClientService } from '@useCases/client/create/interfaces/service-interface';
+import { ITelephoneValidator, IEmailValidator } from '@utils/validator';
 import { mock, MockProxy } from 'jest-mock-extended';
-import { IGetByDataBaseRepo } from 'src/infra/repository/base/getByData/interface-get-by-data-repository';
-import { ValidatorError, VALIDATOR_ERROR } from '@errors/error-validator';
-import { EmailValidator } from '@utils/validator/email_validatot';
+import { IGetByDataBaseRepo, ICreateBaseRepo } from 'src/infra/repository';
+import {
+  DatabaseError,
+  DATABASE_ERROR,
+  AlreadyExists,
+  TypeParamError,
+  ValidatorError,
+  VALIDATOR_ERROR,
+} from '@errors/index';
+import {
+  CreateClientService,
+  ICreateClientModel,
+  ICreateClientService,
+} from '@useCases/client';
+import { IEncryptedPassword } from '@utils/encrypter/interfaces/interface-encrypted';
 
 describe('Create Client Service', () => {
   let service: ICreateClientService;
@@ -18,6 +22,7 @@ describe('Create Client Service', () => {
   let createRepo: MockProxy<ICreateBaseRepo>;
   let validateEmail: MockProxy<IEmailValidator>;
   let validateTelephone: MockProxy<ITelephoneValidator>;
+  let encrypter: MockProxy<IEncryptedPassword>;
 
   const mockCreate: ICreateClientModel = {
     name: 'mock',
@@ -32,18 +37,21 @@ describe('Create Client Service', () => {
     createRepo = mock();
     validateEmail = mock();
     validateTelephone = mock();
+    encrypter = mock();
 
     service = new CreateClientService(
       findRepo,
       createRepo,
       validateEmail,
       validateTelephone,
+      encrypter,
     );
 
     findRepo.get.mockResolvedValue(undefined);
-    createRepo.create.mockResolvedValue(mockCreate);
+    createRepo.create.mockResolvedValue({ ...mockCreate, id: '1' });
     validateEmail.validate.mockReturnValue(true);
     validateTelephone.validate.mockReturnValue(true);
+    encrypter.encrypt.mockResolvedValue('password_encrypted');
   });
 
   // Test Email Validator
@@ -115,11 +123,15 @@ describe('Create Client Service', () => {
   });
 
   //Test create Client
-  it('should create client to have been caleed with data received', async () => {
+  it('should create client to have been caleed with data received and password encrypted', async () => {
     const fn = jest.spyOn(createRepo, 'create');
     await service.start(mockCreate);
+
     expect(fn).toHaveBeenCalledTimes(1);
-    expect(fn).toHaveBeenCalledWith({ table: 'client', data: mockCreate });
+    expect(fn).toHaveBeenCalledWith({
+      table: 'client',
+      data: { ...mockCreate, password: 'password_encrypted' },
+    });
   });
   it('should to throw if repo create return database error message', async () => {
     createRepo.create.mockResolvedValueOnce(DATABASE_ERROR);
@@ -128,10 +140,9 @@ describe('Create Client Service', () => {
     expect(promise).rejects.toThrow(new DatabaseError());
   });
 
-  it('shoul to throw if repo return database error message', () => {
-    createRepo.create.mockResolvedValueOnce(undefined);
-
-    const promise = service.start(mockCreate);
-    expect(promise).rejects.toThrow(new FailedCreated('Client'));
+  it('shoul return a new client with data valids', async () => {
+    const promise = await service.start(mockCreate);
+    console.log(promise);
+    expect(promise).toStrictEqual({ status: 'OK' });
   });
 });
