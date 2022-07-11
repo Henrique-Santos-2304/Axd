@@ -9,7 +9,7 @@ interface ICreateClientService {
 
 namespace ICreateClientService {
   export type Params = ICreateClientModel;
-  export type Response = IUserClientBasic;
+  export type Response = Promise<IUserClientBasic>;
 }
 
 export { ICreateClientService };

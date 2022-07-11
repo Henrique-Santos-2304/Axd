@@ -3,7 +3,7 @@ import { ICreateClientService } from './interfaces/service-interface';
 
 @Injectable()
 class CreateClientService implements ICreateClientService {
-  start({
+  async start({
     name,
     email,
     password,
