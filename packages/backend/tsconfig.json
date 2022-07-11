@@ -15,6 +15,9 @@
     "paths": {
       "@useCases/*": ["./src/data/use_cases/*"],
       "@main/*": ["./src/main/*"],
+      "@errors/*": ["./src/utils/errors/*"],
+      "@utils/*": ["./src/utils/*"],
+
       "@test/*": ["./test/*"]
     }
   }

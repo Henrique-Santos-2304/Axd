@@ -15,5 +15,7 @@ module.exports = {
     '@root/(.*)': '<rootDir>/src/$1',
     '@test/(.*)': '<rootDir>/test/$1',
     '@main/(.*)': '<rootDir>/src/main/$1',
+    '@utils/(.*)': '<rootDir>/src/utils/$1',
+    '@errors/(.*)': '<rootDir>/src/utils/errors/$1',
   },
 };
