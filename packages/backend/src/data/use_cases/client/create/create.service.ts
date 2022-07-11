@@ -23,7 +23,8 @@ class CreateClientService implements ICreateClientService {
   }: ICreateClientService.Params): ICreateClientService.Response {
     const emailIsValid = this.emailValidator.validate({ email });
 
-    if (!emailIsValid) throw new TypeParamError('Email');
+    if (emailIsValid === VALIDATOR_ERROR) throw new ValidatorError('Email');
+    else if (!emailIsValid) throw new TypeParamError('Email');
 
     const userExists = await this.getByData.get({
       table: 'client',
