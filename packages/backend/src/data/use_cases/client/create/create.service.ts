@@ -2,6 +2,7 @@ import { IGetByDataBaseRepo } from 'src/infra/repository/base/getByData/interfac
 import { Injectable } from '@nestjs/common';
 import { ICreateClientService } from './interfaces/service-interface';
 import { AlreadyExists } from '@errors/error-data';
+import { DatabaseError, DATABASE_ERROR } from '@errors/errors-database';
 
 @Injectable()
 class CreateClientService implements ICreateClientService {
@@ -19,7 +20,9 @@ class CreateClientService implements ICreateClientService {
       column: 'email',
       where: email,
     });
-    if (userExists) throw new AlreadyExists('Client');
+
+    if (userExists === DATABASE_ERROR) throw new DatabaseError();
+    else if (userExists) throw new AlreadyExists('Client');
     else
       return {
         id: '',
