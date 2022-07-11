@@ -1,3 +1,5 @@
+import { ICreateBaseRepo } from 'src/infra/repository/base/create/interface-create-data-repository';
+import { ITelephoneValidator } from '@utils/validator/interfaces/interface-telephone-validator';
 import { IEmailValidator } from '@utils/validator/interfaces/interface-email-validator';
 import { AlreadyExists } from '@errors/error-data';
 import { TypeParamError } from '@errors/error-parameters';
@@ -12,7 +14,9 @@ import { ValidatorError, VALIDATOR_ERROR } from '@errors/error-validator';
 describe('Create Client Service', () => {
   let service: ICreateClientService;
   let findRepo: MockProxy<IGetByDataBaseRepo>;
+  let createRepo: MockProxy<ICreateBaseRepo>;
   let validateEmail: MockProxy<IEmailValidator>;
+  let validateTelephone: MockProxy<ITelephoneValidator>;
 
   const mockCreate: ICreateClientModel = {
     name: 'mock',
@@ -25,10 +29,19 @@ describe('Create Client Service', () => {
   beforeAll(() => {
     findRepo = mock();
     validateEmail = mock();
-    service = new CreateClientService(findRepo, validateEmail);
+    validateTelephone = mock();
+
+    service = new CreateClientService(
+      findRepo,
+      createRepo,
+      validateEmail,
+      validateTelephone,
+    );
 
     findRepo.get.mockResolvedValue(undefined);
+    createRepo.create.mockResolvedValue(mockCreate);
     validateEmail.validate.mockReturnValue(true);
+    validateTelephone.validate.mockReturnValue(true);
   });
 
   // Test Email Validator
@@ -44,7 +57,17 @@ describe('Create Client Service', () => {
   });
 
   //Test Telephone Validator
+  it('should to throw if telephone validator is ocurred error', async () => {
+    validateTelephone.validate.mockReturnValueOnce(VALIDATOR_ERROR);
+    const promise = service.start({
+      ...mockCreate,
+      email: 'telophone_notvalid',
+    });
+    expect(promise).rejects.toThrow(new ValidatorError('Telephone'));
+  });
   it('should to throw if telephone type not valid', async () => {
+    validateTelephone.validate.mockReturnValueOnce(false);
+
     const promise = service.start({
       ...mockCreate,
       email: 'telephone_not_valid',
@@ -62,6 +85,14 @@ describe('Create Client Service', () => {
 
   it('shoul to throw if repo return database error message', () => {
     findRepo.get.mockResolvedValueOnce(DATABASE_ERROR);
+
+    const promise = service.start(mockCreate);
+    expect(promise).rejects.toThrow(new DatabaseError());
+  });
+
+  //Test create Client
+  it('should to throw if repo create return database error message', async () => {
+    createRepo.create.mockResolvedValueOnce(DATABASE_ERROR);
 
     const promise = service.start(mockCreate);
     expect(promise).rejects.toThrow(new DatabaseError());

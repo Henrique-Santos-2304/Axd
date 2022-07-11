@@ -17,10 +17,8 @@ interface IUserClientCart {
   flag_car: string;
 }
 
-interface IUserClientFull {
-  data: IUserClientBasic;
-  adress: IAdress;
-  cart_purchase: IUserClientCart[];
-}
+type IClientModel = IUserClientBasic & { adress?: IAdress } & {
+  cart_purchase?: IUserClientCart[];
+};
 
-export { IUserClientFull, IUserClientBasic, IUserClientCart };
+export { IClientModel, IUserClientBasic, IUserClientCart };
