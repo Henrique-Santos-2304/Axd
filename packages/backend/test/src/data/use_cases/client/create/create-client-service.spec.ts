@@ -1,3 +1,7 @@
+import {
+  encryptedPasswordMessage,
+  EncrypterError,
+} from '@errors/error-encrypter';
 import { ITelephoneValidator, IEmailValidator } from '@utils/validator';
 import { mock, MockProxy } from 'jest-mock-extended';
 import { IGetByDataBaseRepo, ICreateBaseRepo } from 'src/infra/repository';
@@ -15,6 +19,7 @@ import {
   ICreateClientService,
 } from '@useCases/client';
 import { IEncryptedPassword } from '@utils/encrypter/interfaces/interface-encrypted';
+import { EncryptPassword } from '@utils/encrypter/encryp-password';
 
 describe('Create Client Service', () => {
   let service: ICreateClientService;
@@ -115,6 +120,12 @@ describe('Create Client Service', () => {
     expect(promise).rejects.toThrow(new AlreadyExists('Client'));
   });
 
+  it('shoul to throw if encrypter return encrypted error message', () => {
+    encrypter.encrypt.mockResolvedValueOnce(encryptedPasswordMessage);
+
+    const promise = service.start(mockCreate);
+    expect(promise).rejects.toThrow(new EncrypterError());
+  });
   it('shoul to throw if repo return database error message', () => {
     findRepo.get.mockResolvedValueOnce(DATABASE_ERROR);
 
