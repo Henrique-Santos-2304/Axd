@@ -1,7 +1,7 @@
 import { ICreateBaseRepo } from 'src/infra/repository/base/create/interface-create-data-repository';
 import { ITelephoneValidator } from '@utils/validator/interfaces/interface-telephone-validator';
 import { IEmailValidator } from '@utils/validator/interfaces/interface-email-validator';
-import { AlreadyExists } from '@errors/error-data';
+import { AlreadyExists, FailedCreated } from '@errors/error-data';
 import { TypeParamError } from '@errors/error-parameters';
 import { DatabaseError, DATABASE_ERROR } from '@errors/errors-database';
 import { CreateClientService } from '@useCases/client/create/create.service';
@@ -97,5 +97,12 @@ describe('Create Client Service', () => {
 
     const promise = service.start(mockCreate);
     expect(promise).rejects.toThrow(new DatabaseError());
+  });
+
+  it('shoul to throw if repo return database error message', () => {
+    createRepo.create.mockResolvedValueOnce(undefined);
+
+    const promise = service.start(mockCreate);
+    expect(promise).rejects.toThrow(new FailedCreated('Client'));
   });
 });
