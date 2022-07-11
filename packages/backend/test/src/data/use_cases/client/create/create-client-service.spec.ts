@@ -28,6 +28,7 @@ describe('Create Client Service', () => {
 
   beforeAll(() => {
     findRepo = mock();
+    createRepo = mock();
     validateEmail = mock();
     validateTelephone = mock();
 

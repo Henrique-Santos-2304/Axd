@@ -45,14 +45,19 @@ class CreateClientService implements ICreateClientService {
     if (userExists === DATABASE_ERROR) throw new DatabaseError();
     else if (userExists) throw new AlreadyExists('Client');
 
-    return {
-      id: '',
-      name,
-      email,
-      password,
-      telephone,
-      age,
-    };
+    const created = await this.createRepo.create({
+      table: 'client',
+      data: {
+        name,
+        email,
+        password,
+        telephone,
+        age,
+      },
+    });
+
+    if (created === DATABASE_ERROR) throw new DatabaseError();
+    return created;
   }
 }
 
