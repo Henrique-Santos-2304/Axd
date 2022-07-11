@@ -58,7 +58,13 @@ describe('Create Client Service', () => {
     validateTelephone.validate.mockReturnValue(true);
     encrypter.encrypt.mockResolvedValue('password_encrypted');
   });
-
+  // Use Case
+  it('should service start to have been caleed with data received', async () => {
+    const fn = jest.spyOn(service, 'start');
+    await service.start(mockCreate);
+    expect(fn).toHaveBeenCalledTimes(1);
+    expect(fn).toHaveBeenCalledWith(mockCreate);
+  });
   // Test Email Validator
   it('should Email validtor to have been caleed with data received', async () => {
     const fn = jest.spyOn(validateEmail, 'validate');

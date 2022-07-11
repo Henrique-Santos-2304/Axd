@@ -1,3 +1,7 @@
+import {
+  encryptedPasswordMessage,
+  EncrypterError,
+} from '@errors/error-encrypter';
 import { ValidatorError, VALIDATOR_ERROR } from '@errors/error-validator';
 import { IEmailValidator, ITelephoneValidator } from '@utils/validator';
 import { ICreateClientService } from './interfaces';
@@ -52,12 +56,17 @@ class CreateClientService implements ICreateClientService {
     if (userExists === DATABASE_ERROR) throw new DatabaseError();
     else if (userExists) throw new AlreadyExists('Client');
 
+    const passwordEncrypted = await this.encrypt.encrypt({ password });
+
+    if (passwordEncrypted === encryptedPasswordMessage)
+      throw new EncrypterError();
+
     const created = await this.createRepo.create({
       table: 'client',
       data: {
         name,
         email,
-        password,
+        password: passwordEncrypted,
         telephone,
         age,
       },
